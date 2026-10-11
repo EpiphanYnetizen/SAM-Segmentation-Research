@@ -1,0 +1,13 @@
+model_type: vit_b
+checkpoint: checkpoints/sam_vit_b_01ec64.pth
+device: cuda
+
+data_dir: data/splits/train
+out_dir: outputs/mask_decoder_v1
+
+training:
+  epochs: 5
+  batch_size: 2
+  learning_rate: 1.0e-4
+  freeze: [image_encoder, prompt_encoder]
+  loss: focal_dice

@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+data/raw/
+data/annotations/
+data/exports/
+outputs/
+checkpoints/
+*.onnx
+*.pth
+*.safetensors
+playground/
+.idea/
+.vscode/
+*.log

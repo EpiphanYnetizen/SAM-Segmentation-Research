@@ -1,0 +1,9 @@
+services:
+  demo:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.app
+    ports:
+      - "7860:7860"
+    volumes:
+      - ../../checkpoints:/workspace/checkpoints:ro

@@ -1,0 +1,19 @@
+version: 1
+background: 0
+categories:
+  1:
+    name: meat
+    cn: 肉块
+    color: [220, 20, 60]
+  2:
+    name: fish
+    cn: 鱼块
+    color: [30, 144, 255]
+  3:
+    name: vegetable
+    cn: 青菜
+    color: [34, 139, 34]
+  4:
+    name: rice
+    cn: 米饭
+    color: [255, 215, 0]

@@ -1,0 +1,20 @@
+model_type: vit_b
+checkpoint: checkpoints/sam_vit_b_01ec64.pth
+device: cuda
+
+data_dir: data/splits/train
+out_dir: outputs/finetuned
+
+lora:
+  rank: 8
+  alpha: 16
+  dropout: 0.1
+  target_modules:
+    - query
+    - value
+
+training:
+  epochs: 5
+  batch_size: 2
+  learning_rate: 3.0e-4
+  seed: 42
