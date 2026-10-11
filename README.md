@@ -10,7 +10,6 @@
 先验证 SAM 在**自采食堂菜品 / 日常物品数据**上的零样本能力与失败边界，再用 LoRA 后训练 SAM（image encoder / mask decoder），并用 mIoU、Dice、边界 F1 对比 `zero-shot vs fine-tuned`，最终产出一个可上传图片的分割演示 UI。
 
 ## 目录与角色对应
-1
 
 | 目录 | 角色 | 负责内容 |
 |---|---|---|
