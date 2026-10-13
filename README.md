@@ -4,7 +4,6 @@
 > 核心研究问题：Does Segment Anything work on all cases?
 
 > 第一次看这个仓库的人，先读 [`START_HERE.md`](./START_HERE.md)，用大白话分好“三个人先干什么”。
-111
 ## 一句话目标
 
 先验证 SAM 在**自采食堂菜品 / 日常物品数据**上的零样本能力与失败边界，再用 LoRA 后训练 SAM（image encoder / mask decoder），并用 mIoU、Dice、边界 F1 对比 `zero-shot vs fine-tuned`，最终产出一个可上传图片的分割演示 UI。
