@@ -18,3 +18,11 @@ categories:
     name: rice
     cn: 米饭
     color: [255, 215, 0]
+  5:
+    name: other
+    cn: 其他食物
+    color: [255, 165, 0]
+  5:
+    name: other
+    cn: 其他食物
+    color: [255, 165, 0]
