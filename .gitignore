@@ -6,6 +6,7 @@ data/raw/
 data/annotations/
 data/exports/
 outputs/
+docs/video-script.md
 checkpoints/
 *.onnx
 *.pth

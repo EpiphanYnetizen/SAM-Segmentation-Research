@@ -85,7 +85,7 @@
 | 至少 SFT/RLHF/OPD/OPSD 其一，通常 LoRA | LoRA 微调 mask decoder / image encoder |
 | 自采数据 + 自定义类别，加 5-10 分 | `data/raw` 自采 + `data/categories.yaml` |
 | 3 页 PPT：题目成员 / 数据来源 / 模型改进 | 10/25 前由 PM 交付 `开题报告.ppt` |
-| 3 分钟视频 | 10/25 前由 PM 交付 `开题报告.mp4`，脚本见 `docs/video-script.md` |
+| 3 分钟视频 | 10/25 前由 PM 交付 `开题报告.mp4`，演讲稿单独保存、不进仓库 |
 
 ## 4. 风险预案
 
