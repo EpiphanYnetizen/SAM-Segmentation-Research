@@ -11,4 +11,4 @@ RUN pip install -r /workspace/model/requirements.txt
 COPY . /workspace
 
 EXPOSE 7860
-CMD ["python", "app/main.py", "--checkpoint", "/workspace/checkpoints/sam_vit_b_01ec64.pth"]
+CMD ["python", "app/main.py", "--checkpoint", "/workspace/checkpoints/sam_vit_b_01ec64.pth", "--host", "0.0.0.0", "--port", "7860"]

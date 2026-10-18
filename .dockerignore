@@ -1,0 +1,23 @@
+.git/
+.venv/
+.idea/
+.vscode/
+__pycache__/
+*.pyc
+
+# 这些都不该进镜像（构建上下文是仓库根目录）
+checkpoints/
+data/raw/
+data/exports/
+data/annotations/
+data/splits/
+outputs/
+playground/
+
+*.pth
+*.onnx
+*.safetensors
+*.mp4
+*.ppt
+*.pptx
+*.log
