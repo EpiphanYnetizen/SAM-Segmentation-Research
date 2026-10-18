@@ -1,5 +1,6 @@
 version: 1
 background: 0
+ignore: 255
 categories:
   1:
     name: meat
