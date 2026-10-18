@@ -46,7 +46,7 @@ def infer_one(
 
     from scipy import ndimage
 
-    for label in sorted({int(x) for x in np.unique(gt) if x != 0}):
+    for label in sorted({int(x) for x in np.unique(gt) if x not in (0, 255)}):
         cls = (gt == label).astype(np.uint8)
         labeled, n = ndimage.label(cls)
         for inst in range(1, n + 1):

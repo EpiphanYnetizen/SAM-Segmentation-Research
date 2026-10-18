@@ -13,7 +13,7 @@ data/splits/{train,val,test}/
 - `<img_id>.png` 是单通道 uint8：
   - `0` 背景
   - `1..5` 前景类别，定义见 [`../data/categories.yaml`](../data/categories.yaml)
-  - `255` ignore，评测时完全跳过
+  - `255` ignore，推理和评测都会跳过（`evaluation/metrics.py` 默认 `ignore_labels=(0, 255)`）
 - 预测 mask 与 GT mask **同名**，放在 `outputs/<run>/` 下。
 
 ## 类别

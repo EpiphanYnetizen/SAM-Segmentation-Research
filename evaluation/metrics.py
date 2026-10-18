@@ -43,9 +43,18 @@ def dice(pred: np.ndarray, gt: np.ndarray, eps: float = 1e-7) -> float:
     return float(2 * inter / (pred.sum() + gt.sum() + eps))
 
 
-def compute_metrics(pred: np.ndarray, gt: np.ndarray) -> dict[str, float]:
-    """返回 mIoU/meanDice/meanBoundaryF1（按 1..N 前景类别平均）。"""
-    labels = sorted({int(x) for x in np.unique(gt) if x != 0})
+def compute_metrics(
+    pred: np.ndarray,
+    gt: np.ndarray,
+    ignore_labels: tuple[int, ...] = (0, 255),
+) -> dict[str, float]:
+    """返回 mIoU/meanDice/meanBoundaryF1（按非忽略前景类别平均）。
+
+    默认忽略 0（背景）和 255（ignore）。如果要只报 1-4 类、把 other 单列，
+    评分口径应在报告阶段另作拆分，这里不做隐藏魔法。
+    """
+    ignore = set(ignore_labels)
+    labels = sorted({int(x) for x in np.unique(gt) if x not in ignore})
     if not labels:
         return {"mIoU": 0.0, "meanDice": 0.0, "meanBoundaryF1": 0.0}
 

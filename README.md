@@ -22,6 +22,29 @@
                               └→ LoRA 微调 → 再推理 → 评测 ─┴→ 对比表 → 报告 / PPT / 视频
 ```
 
+## 现在能真跑，还是骨架
+
+**装好依赖后能真跑：**
+
+- `scripts/split_dataset.py`：`data/exports` -> `data/splits/{train,val,test}`
+- `model/zero_shot_inference.py`：SAM 零样本推理，代码已接好，只差权重和依赖
+- `evaluation/evaluate.py` + `metrics.py`：GT 和预测 mask 对齐，算 mIoU / Dice / 边界 F1
+- `scripts/run_ablation.py`：多份 metric JSON -> Markdown 对比表
+
+**还是骨架，别当已跑通：**
+
+- `model/train_lora.py`：组员 B 的 image encoder LoRA，目前只加载配置，训练循环待写
+- `model/train_mask_decoder.py`：组长的 mask decoder 微调，同上
+- `app/main.py`：Gradio 界面能打开，但 `render_mask()` 还返回全零，没接 SAM
+
+## 按这个顺序做
+
+1. **组员 A**：照片 -> `data/exports` -> `scripts/split_dataset.py`，交出一份 train/val/test
+2. **组员 B**：装 `model/requirements.txt` -> 下载权重 -> 在 `val` 跑通 `zero_shot_inference.py`
+3. **组员 A**：跑 `evaluation/evaluate.py`，得到第一份 `zero_shot_metrics.json`（零样本基线）
+4. **组员 B**：补 `train_lora.py` 的训练循环
+5. **组长**：补 `train_mask_decoder.py`，并把 `app/main.py` 的 `render_mask()` 接上真实推理
+
 ## 硬节点
 
 | 日期 | 事项 | 状态 |

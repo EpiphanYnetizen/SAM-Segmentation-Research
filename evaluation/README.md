@@ -39,4 +39,6 @@ python evaluation/evaluate.py --gt data/splits/val --pred outputs/zero_shot --ou
 
 ## 注意
 
-`compute_metrics` 默认不计背景类（id=0）进类别均值。`other`（id=5）单独报，不要混进主指标。
+`compute_metrics` 默认忽略 `0`（背景）和 `255`（ignore），对其它所有前景类的 mIoU / Dice / 边界 F1 取算术平均。
+
+所以当前脚本的 summary 会**包含 `other`（id=5）**。报告口径若想「主指标只报 1-4，other 单独一栏」，到结果阶段再拆，脚本不替你做这个隐藏选择。
