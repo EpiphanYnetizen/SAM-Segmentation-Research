@@ -34,9 +34,7 @@ def main() -> None:
         pred = np.asarray(Image.open(pred_map[name]).convert("L"), dtype=np.uint8)
         per_image[name] = compute_metrics(pred, gt)
 
-    agg = compute_metrics(
-        *[np.concatenate([np.frombuffer(x, np.uint8) for x in []])] if False else (np.array([]), np.array([])),
-    ) if not common else {}
+    agg: dict[str, float] = {}
     if common:
         keys = ["mIoU", "meanDice", "meanBoundaryF1"]
         agg = {k: float(np.mean([per_image[n][k] for n in common])) for k in keys}

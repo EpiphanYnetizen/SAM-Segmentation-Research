@@ -20,6 +20,8 @@ def render_mask(input_image: np.ndarray) -> np.ndarray:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--checkpoint", type=Path, default=Path("checkpoints/sam_vit_b_01ec64.pth"))
+    parser.add_argument("--host", default="127.0.0.1", help="Docker 里必须传 0.0.0.0")
+    parser.add_argument("--port", type=int, default=7860)
     args = parser.parse_args()
 
     demo = gr.Interface(
@@ -28,7 +30,7 @@ def main() -> None:
         outputs=gr.Image(type="numpy"),
         title="SAM Segmentation Demo",
     )
-    demo.launch()
+    demo.launch(server_name=args.host, server_port=args.port)
 
 
 if __name__ == "__main__":

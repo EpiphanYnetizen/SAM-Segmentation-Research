@@ -18,9 +18,9 @@
 
 | 角色 | 负责模块 | 成员 |
 |---|---|---|
-| 组长 / PM | 统筹 + mask decoder 微调与消融、`app/`、`scripts/`、`docker/`、报告/PPT/视频 | 组长 |
-| 组员 A · 数据与评测 | `data/`、`evaluation/` | 待填 |
-| 组员 B · 模型与训练 | SAM 加载与 zero-shot、image encoder LoRA、checkpoint | 待填 |
+| 组长 / PM | 统筹 + mask decoder 微调与消融、`app/`、`scripts/`、`docker/`、报告/PPT/视频 | 黄闻喆 |
+| 组员 A · 数据与评测 | `data/`、`evaluation/` | 待填姓名 |
+| 组员 B · 模型与训练 | SAM 加载与 zero-shot、image encoder LoRA、checkpoint | 待填姓名 |
 
 ### 贡献值建议（合计 100）
 
@@ -39,7 +39,7 @@
 | 角色 | 交付 |
 |---|---|
 | PM | 发报名邮件、建仓库、定接口契约、预装依赖、跑通 mask decoder 前向 |
-| A | 定 3-5 类标签、开始自采 100+ 张、搭好 Label Studio |
+| A | 定类别清单（`data/categories.yaml`）、开始自采照片、搭好 Label Studio |
 | B | 读 SAM 论文、下载 `sam_vit_b` / MobileSAM 权重、跑通官方 demo |
 
 ### W2：10/18 - 10/24
@@ -47,7 +47,7 @@
 | 角色 | 交付 |
 |---|---|
 | PM | 10/24 前完成开题 PPT 与视频成品，10/25 前发送；同时搭好 mask decoder 微调脚手架 |
-| A | 标注完成约 200 张、导出 COCO/mask、划分 7:1:2 |
+| A | 标注完成 80-120 张（约 400-600 个实例）、导出 mask、划分 7:1:2 |
 | B | 完成 zero-shot 批量推理，输出 `outputs/zero_shot` |
 
 ### W3：10/25 - 10/31
@@ -66,16 +66,9 @@
 | A | 补充微调后评测、对比表与边界 F1 |
 | B | image encoder 消融、最终 checkpoint 固化 |
 
-## 2. 接口契约（先定，避免返工）
+## 2. 接口契约
 
-| 接口 | 文件 | 约定 |
-|---|---|---|
-| 数据集 | `data/exports/` | 每个样本：`*.jpg` + 同名 `*.png` mask；类别见 `data/categories.yaml` |
-| split 目录 | `data/splits/{train,val,test}/images|masks/` | A 产出，B 和 PM 只读消费 |
-| 推理结果 | `outputs/zero_shot/{image_id}.png` | B 产出，A 的评测和 PM 的 UI 只读消费 |
-| 评测结果 | `outputs/*_metrics.json` | A 产出，PM 的图表读取 |
-| encoder checkpoint | `checkpoints/lora/encoder/{run_id}/` | B 产出，评测与 app 读取 |
-| mask decoder checkpoint | `checkpoints/lora/mask_decoder/{run_id}/` | PM 产出，评测与 app 读取 |
+统一维护在 [`docs/data-protocol.md`](docs/data-protocol.md)（唯一真源）。这里不再抄一份，避免两处不一致。
 
 ## 3. 课程硬性要求对照
 
@@ -92,7 +85,7 @@
 | 风险 | Plan B |
 |---|---|
 | 无 GPU / 显存不够 | 用 `SAM-ViT-B` 或 MobileSAM；申请院计算资源或免费云 GPU |
-| 标注过慢 | 先标 3 类共 120-150 张，抢核心实验闭环 |
+| 标注过慢 | 先标 4 类共 60-80 张，抢核心实验闭环；剩下的当增量 |
 | 微调后不比 zero-shot 好 | 这也是结论；把失败案例和边界分析作为核心贡献 |
 | SAM 权重下载慢 | 提前用镜像/HF 下载并放 `checkpoints/`，成员间共享 |
 | 模型要求像语言模型的 SFT/RLHF 表述 | 开题前发邮件和老师确认视觉模型 LoRA 是否满足要求 |
