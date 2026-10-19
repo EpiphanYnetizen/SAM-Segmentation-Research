@@ -1,6 +1,6 @@
 # 系统流程与模块边界
 
-目录与命名规则见 [`data-protocol.md`](./data-protocol.md)，这里只说流程，以及谁该碰谁不该碰。
+目录与命名规则见 [`data-protocol.md`](./data-protocol.md)，本文只说明流程与模块职责边界。
 
 ## 端到端流程
 
@@ -26,10 +26,10 @@
 app/main.py 只读 checkpoints/ 和 outputs/
 ```
 
-## 模块边界（越界就是返工的源头）
+## 模块边界（越界操作是返工的主要来源）
 
 - `data/`：不碰模型，只生产 splits。
 - `model/`：不算指标，只生产 mask 和 checkpoint。
 - `evaluation/`：不碰模型，只消费 GT 和预测 mask。
 - `app/`：只读 `model/` 的推理函数和 `outputs/`。
-- `scripts/`：组长的编排脚本，输入输出都写死在 CLI 参数里。
+- `scripts/`：组长的编排脚本，输入输出均由 CLI 参数显式声明。

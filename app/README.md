@@ -1,21 +1,21 @@
 # 可视化 Demo（组长）
 
-Gradio 最小闭环：上传图片 -> 点/框提示 -> 显示分割 mask。
+Gradio 演示闭环：上传图片 -> 点 / 框提示 -> 输出分割 mask。
 
-## 现状
+## 当前状态
 
-`main.py` 目前是**骨架**。CLI、界面和参数都在，但 `render_mask()` 还只返回全零，**没有真正调用 SAM** —— 别当成已跑通。
+`main.py` 已完成 CLI、界面与参数框架，但 `render_mask()` 当前返回全零，尚未接入真实 SAM 推理，请勿视为已完成。
 
 ## 启动
 
 ```bash
 pip install -r app/requirements.txt
 python app/main.py --checkpoint checkpoints/sam_vit_b_01ec64.pth
-# 浏览器打开 http://localhost:7860
+# 浏览器访问 http://localhost:7860
 ```
 
-## 还要做什么
+## 待实现
 
-1. 把 `render_mask()` 换成真实 SAM 推理，复用 `model/zero_shot_inference.py` 的 `load_predictor`。
-2. 加模型切换：没有 `--lora-dir` 走 zero-shot，有就走微调后的模型。
-3. 进 Docker 必须 `--host 0.0.0.0`，否则容器外打不开（见 [`../docker/README.md`](../docker/README.md)）。
+1. 将 `render_mask()` 替换为真实 SAM 推理，复用 `model/zero_shot_inference.py` 的 `load_predictor`。
+2. 增加模型切换：未提供 `--lora-dir` 时使用 zero-shot，提供时使用微调模型。
+3. Docker 环境需传入 `--host 0.0.0.0`（详见 [`../docker/README.md`](../docker/README.md)）。
