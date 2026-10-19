@@ -19,8 +19,8 @@
 | 角色 | 负责模块 | 成员 |
 |---|---|---|
 | 组长 / PM | 统筹 + mask decoder 微调与消融、`app/`、`scripts/`、`docker/`、报告/PPT/视频 | 黄闻喆 |
-| 组员 A · 数据与评测 | `data/`、`evaluation/` | 待填姓名 |
-| 组员 B · 模型与训练 | SAM 加载与 zero-shot、image encoder LoRA、checkpoint | 待填姓名 |
+| 组员 A · 数据与评测 | `data/`、`evaluation/` | 曹庆科 |
+| 组员 B · 模型与训练 | SAM 加载与 zero-shot、image encoder LoRA、checkpoint | 葛瀚然 |
 
 ### 贡献值建议（合计 100）
 

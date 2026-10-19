@@ -1,4 +1,4 @@
-# 评测（组员 A）
+# 评测（组员 A · 曹庆科）
 
 本模块负责对齐 GT 与预测 mask，计算 mIoU、mean Dice、mean Boundary F1。
 指标全部由 `metrics.py` 使用 NumPy 与 SciPy 自行实现，报告可解释具体公式。

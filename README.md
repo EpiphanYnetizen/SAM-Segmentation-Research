@@ -8,8 +8,8 @@
 | 你是谁 | 第一步 | 你负责的目录 | 你要交的东西 |
 |---|---|---|---|
 | 组长（黄闻喆） | [`team-plan.md`](./team-plan.md) | `app/` `docker/` `scripts/`，以及 `model/train_mask_decoder.py` | mask decoder 微调、消融实验、演示 UI、开题 PPT/视频、报告串稿 |
-| 组员 B | [`model/README.md`](./model/README.md) | `model/`（`train_mask_decoder.py` 除外） | SAM 加载与 zero-shot 推理、image encoder LoRA、checkpoint |
-| 组员 A | [`data/README.md`](./data/README.md) → [`evaluation/README.md`](./evaluation/README.md) | `data/`、`evaluation/` | 自采图片与标注、数据集划分、指标计算、失败案例 |
+| 组员 B（葛瀚然） | [`model/README.md`](./model/README.md) | `model/`（`train_mask_decoder.py` 除外） | SAM 加载与 zero-shot 推理、image encoder LoRA、checkpoint |
+| 组员 A（曹庆科） | [`data/README.md`](./data/README.md) → [`evaluation/README.md`](./evaluation/README.md) | `data/`、`evaluation/` | 自采图片与标注、数据集划分、指标计算、失败案例 |
 
 成员之间通过接口交接，接口定义见 [`docs/data-protocol.md`](./docs/data-protocol.md)，谁产出、谁消费均需在文档中记录，避免口头约定造成偏差。
 
@@ -53,7 +53,7 @@
 
 | 日期 | 事项 | 状态 |
 |---|---|---|
-| 10/11 | 报名邮件，主题 `深度学习_[姓名1]_[姓名2]_[姓名3]_选题_2` | 已过期，需确认是否已发 |
+| 10/11 | 报名邮件，主题 `深度学习_黄闻喆_曹庆科_葛瀚然_选题_2` | 已发送 |
 | **10/25** | **交 `开题报告.ppt`（恰好 3 页）+ `开题报告.mp4`（3 分钟）** | 硬截止，进行中 |
 | 10/25 后 | zero-shot 跑通 → 双分支 LoRA → 消融 → 最终报告 | 未开始 |
 
@@ -62,7 +62,7 @@
 ## 进度看板
 
 - [x] 仓库骨架、分工、接口契约
-- [ ] 报名邮件确认是否已发
+- [x] 报名邮件已发送
 - [ ] 组员 A：自采 80-120 张并标注（目标 400-600 个实例）
 - [ ] 组员 B：跑通 SAM zero-shot
 - [ ] 组长：mask decoder 微调 + 消融
