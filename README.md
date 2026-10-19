@@ -3,7 +3,7 @@
 > 深度学习课程项目 · Research Track No.2 · Large Visual Model
 > 核心研究问题：Does Segment Anything work on all cases?
 
-## 你该先看哪个文件
+## 阅读入口
 
 | 你是谁 | 第一步 | 你负责的目录 | 你要交的东西 |
 |---|---|---|---|
@@ -11,7 +11,7 @@
 | 组员 B | [`model/README.md`](./model/README.md) | `model/`（`train_mask_decoder.py` 除外） | SAM 加载与 zero-shot 推理、image encoder LoRA、checkpoint |
 | 组员 A | [`data/README.md`](./data/README.md) → [`evaluation/README.md`](./evaluation/README.md) | `data/`、`evaluation/` | 自采图片与标注、数据集划分、指标计算、失败案例 |
 
-三个人之间只通过**接口**交接，接口定义见 [`docs/data-protocol.md`](./docs/data-protocol.md)。谁产出、谁消费都写在那里，不要口头约定。
+成员之间通过接口交接，接口定义见 [`docs/data-protocol.md`](./docs/data-protocol.md)，谁产出、谁消费均需在文档中记录，避免口头约定造成偏差。
 
 ## 项目要做什么
 
@@ -22,28 +22,32 @@
                               └→ LoRA 微调 → 再推理 → 评测 ─┴→ 对比表 → 报告 / PPT / 视频
 ```
 
-## 现在能真跑，还是骨架
+## 当前实现状态
 
-**装好依赖后能真跑：**
+### 已实现（安装依赖后可直接运行）
 
-- `scripts/split_dataset.py`：`data/exports` -> `data/splits/{train,val,test}`
-- `model/zero_shot_inference.py`：SAM 零样本推理，代码已接好，只差权重和依赖
-- `evaluation/evaluate.py` + `metrics.py`：GT 和预测 mask 对齐，算 mIoU / Dice / 边界 F1
-- `scripts/run_ablation.py`：多份 metric JSON -> Markdown 对比表
+| 模块 | 用途 |
+|---|---|
+| `scripts/split_dataset.py` | 将 `data/exports` 划分为 `data/splits/{train,val,test}` |
+| `model/zero_shot_inference.py` | 加载 SAM，按每个 GT mask 的中心点完成 zero-shot 推理 |
+| `evaluation/evaluate.py` | 对齐 GT 与预测 mask，输出 mIoU / Dice / 边界 F1 |
+| `scripts/run_ablation.py` | 汇总多份评测结果，生成 Markdown 对比表 |
 
-**还是骨架，别当已跑通：**
+### 待实现（当前为框架代码，尚未接入训练）
 
-- `model/train_lora.py`：组员 B 的 image encoder LoRA，目前只加载配置，训练循环待写
-- `model/train_mask_decoder.py`：组长的 mask decoder 微调，同上
-- `app/main.py`：Gradio 界面能打开，但 `render_mask()` 还返回全零，没接 SAM
+| 模块 | 待办 |
+|---|---|
+| `model/train_lora.py` | 组员 B 补充 image encoder LoRA 训练循环 |
+| `model/train_mask_decoder.py` | 组长补充 mask decoder 微调训练循环 |
+| `app/main.py` | Gradio 界面可启动，需将 `render_mask()` 接入真实 SAM 推理 |
 
-## 按这个顺序做
+## 推进顺序
 
-1. **组员 A**：照片 -> `data/exports` -> `scripts/split_dataset.py`，交出一份 train/val/test
-2. **组员 B**：装 `model/requirements.txt` -> 下载权重 -> 在 `val` 跑通 `zero_shot_inference.py`
-3. **组员 A**：跑 `evaluation/evaluate.py`，得到第一份 `zero_shot_metrics.json`（零样本基线）
-4. **组员 B**：补 `train_lora.py` 的训练循环
-5. **组长**：补 `train_mask_decoder.py`，并把 `app/main.py` 的 `render_mask()` 接上真实推理
+1. 组员 A：整理自采照片与标注，使用 `scripts/split_dataset.py` 产出 `data/splits/{train,val,test}`。
+2. 组员 B：安装 `model/requirements.txt`，下载权重，在 `val` 上运行 `model/zero_shot_inference.py`。
+3. 组员 A：运行 `evaluation/evaluate.py`，产出第一份 `outputs/zero_shot_metrics.json` 基线。
+4. 组员 B：实现 `model/train_lora.py` 的训练循环。
+5. 组长：实现 `model/train_mask_decoder.py`，并完成 `app/main.py` 的真实推理接入。
 
 ## 硬节点
 
@@ -53,7 +57,7 @@
 | **10/25** | **交 `开题报告.ppt`（恰好 3 页）+ `开题报告.mp4`（3 分钟）** | 硬截止，进行中 |
 | 10/25 后 | zero-shot 跑通 → 双分支 LoRA → 消融 → 最终报告 | 未开始 |
 
-开题材料 10/24 前做成成品，10/25 当天发邮件。
+开题材料在 10/24 前定稿，10/25 当天发送。
 
 ## 进度看板
 
@@ -65,7 +69,7 @@
 - [ ] 三人：`zero-shot vs fine-tuned` 对比表
 - [ ] 开题 PPT（3 页）+ 视频（3 分钟）
 
-## 装环境
+## 环境准备
 
 **只有组员 B 需要完整装一遍**，因为只有他的脚本要 PyTorch 和 SAM。A 和组长按需装。
 
