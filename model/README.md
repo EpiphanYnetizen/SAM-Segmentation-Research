@@ -43,6 +43,15 @@ python model/train_lora.py --config model/config/default.yaml
 
 产出 `checkpoints/lora/<run_id>/`，并以 `--lora-dir` 再次推理得到 `outputs/finetuned/`。
 
+### 5. 不标注也能先验证环境
+
+```bash
+python model/quick_demo.py --image data/raw/xxx.jpg
+python model/quick_demo.py --image data/raw/xxx.jpg --point 800 600
+```
+
+自动模式不需要任何标注，用来确认权重能加载、显卡能跑；结果保存在 `outputs/demo/`。
+
 ## 组长任务
 
 ```bash
