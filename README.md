@@ -71,7 +71,7 @@
 
 ## 环境准备
 
-**只有组员 B 需要完整装一遍**，因为只有他的脚本要 PyTorch 和 SAM。A 和组长按需装。
+统一使用仓库根目录的 `.venv`，PyCharm 的解释器也指向它。三个人装同一套依赖，避免版本漂移。
 
 ```bash
 python -m venv .venv
@@ -84,6 +84,14 @@ pip install -r requirements.txt
 | 组员 A | 无，`requirements.txt` 够用 |
 | 组员 B | `pip install -r model/requirements.txt` |
 | 组长（要跑 UI） | `pip install -r app/requirements.txt` |
+
+Windows 上 `torch` 必须用 cu118 轮子。`model/requirements.txt` 已固定 `torch==2.7.1+cu118` 与 `torchvision==0.22.1+cu118`，直接安装即可。单独装 torch 时若不指定索引，会装成 CPU 版，SAM 推理会慢几十倍。
+
+验证环境：
+
+```bash
+python -c "import torch, segment_anything; print(torch.__version__, torch.cuda.is_available())"
+```
 
 ## 仓库规则
 
