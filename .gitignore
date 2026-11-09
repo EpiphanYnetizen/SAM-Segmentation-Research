@@ -5,6 +5,7 @@ __pycache__/
 data/raw/
 data/annotations/
 data/exports/
+data/splits/
 outputs/
 docs/video-script.md
 checkpoints/
