@@ -10,6 +10,8 @@ data/splits/{train,val,test}/
   masks/<img_id>.png
 ```
 
+- `data/exports/images/` 与 `data/exports/masks/` 是固定路径，空目录由 `.gitkeep` 占位；`.gitkeep` 不是数据，校验和切分脚本会忽略它。
+- `data/annotations/` 只用于留底，转换脚本不读它；`data/splits/` 由切分脚本生成，不要手改。
 - `<img_id>.png` 是单通道 uint8：
   - `0` 背景
   - `1..5` 前景类别，定义见 [`../data/categories.yaml`](../data/categories.yaml)

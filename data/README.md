@@ -7,14 +7,40 @@
 
 ```text
 data/
-  raw/                  # 原始照片归档（可选，git 忽略）
-  exports/              # 标注产物，下游只读
-    images/xxx.jpg
-    masks/xxx.png       # 单通道 uint8：0 背景，1..5 类别，255 ignore
-  annotations/          # 标注工具的原始导出（可选，git 忽略）
+  raw/
+    .gitkeep            # 占位文件；照片放这里或你自己的目录，内容 git 忽略
+  annotations/
+    .gitkeep            # 占位文件；Label Studio JSON 可放这里，内容 git 忽略
+  exports/
+    images/
+      .gitkeep          # 占位文件；转换后的原图放这里
+    masks/
+      .gitkeep          # 占位文件；转换后的 mask 放这里
   splits/               # 由 scripts/split_dataset.py 生成
+    .gitkeep
   categories.yaml       # 类别清单，唯一真源
 ```
+
+`.gitkeep` 只是让 Git 保留空文件夹，不是数据，不要删，也不要把它当图片。
+
+## 路径是固定的
+
+- `data/exports/images/` 和 `data/exports/masks/` 是固定路径。`validate_dataset.py` 和 `split_dataset.py` 默认都读 `data/exports`。
+- 如果你把输出目录改成别的名字，必须同时给校验和切分脚本传 `--data-dir` 和 `--out`；后续训练、评测文档默认仍按 `data/exports`，所以**不建议改**。
+- `data/annotations/` 只是留底，没有任何脚本读它，名字可以不同；但为了组内一致，建议沿用。
+- `data/raw/` 只是归档，脚本不读；照片放你自己的目录也可以。
+- `data/splits/` 由脚本生成，不要手动重命名或移动。
+- 真实图片、mask、JSON 都不会进 Git，只有 `.gitkeep` 和文档会进 Git。
+
+## 目录里放什么
+
+| 内容 | 放哪 | 是否必须 |
+|---|---|---|
+| 原始照片 | `data/raw/` 或你自己的目录 | 否 |
+| Label Studio 导出的 JSON | `data/annotations/` 或你自己的目录 | 否 |
+| 转换后的原图 | `data/exports/images/` | 是 |
+| 转换后的 mask | `data/exports/masks/` | 是 |
+| 划分结果 | `data/splits/` | 由脚本生成 |
 
 ## 交付物
 

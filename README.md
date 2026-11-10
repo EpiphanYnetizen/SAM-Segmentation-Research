@@ -52,6 +52,9 @@
 4. 组员 B：实现 `model/train_lora.py` 的训练循环。
 5. 组长：实现 `model/train_mask_decoder.py`，并完成 `app/main.py` 的真实推理接入。
 
+> `data/exports/images`、`data/exports/masks`、`data/annotations`、`data/splits` 已建好；空目录用 `.gitkeep` 占位，真实数据不会进 Git。
+
+
 ## 常用命令
 
 ```powershell

@@ -9,6 +9,8 @@ import argparse
 import shutil
 from pathlib import Path
 
+IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".bmp", ".webp"}
+
 
 def split(
     data_dir: Path,
@@ -19,7 +21,24 @@ def split(
     import random
 
     rng = random.Random(seed)
-    images = sorted((data_dir / "images").glob("*"))
+    images = sorted(
+        path
+        for path in (data_dir / "images").glob("*")
+        if path.is_file() and path.suffix.lower() in IMAGE_EXTS
+    )
+    if not images:
+        raise SystemExit(f"{data_dir / 'images'} 里没有图片")
+
+    missing_masks = [
+        image.name
+        for image in images
+        if not (data_dir / "masks" / f"{image.stem}.png").is_file()
+    ]
+    if missing_masks:
+        raise SystemExit(
+            "以下图片缺少同名 mask: " + ", ".join(missing_masks[:10])
+        )
+
     rng.shuffle(images)
     n = len(images)
     n_train = round(n * ratios[0])
