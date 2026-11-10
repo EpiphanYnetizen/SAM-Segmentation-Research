@@ -9,12 +9,15 @@ lora:
   rank: 8
   alpha: 16
   dropout: 0.1
+  # SAM ViT 的注意力层参数名是 qkv / proj（不是 query / value），
+  # 写错时 peft 会直接报 Target modules not found。
   target_modules:
-    - query
-    - value
+    - qkv
+    - proj
 
 training:
   epochs: 5
-  batch_size: 2
+  batch_size: 1
+  grad_accum: 4
   learning_rate: 3.0e-4
   seed: 42
