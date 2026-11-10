@@ -7,11 +7,11 @@
 
 ```text
 data/
-  raw/                  # 采集的原始照片（git 忽略，不上传）
+  raw/                  # 可选归档；主标注目录在仓库外 tools/labelstudio/images
   exports/              # 标注产物，下游只读
     images/xxx.jpg
     masks/xxx.png       # 单通道 uint8：0 背景，1..5 类别，255 ignore
-  annotations/          # Label Studio 原始导出（git 忽略）
+  annotations/          # 其他标注工具的原始导出（git 忽略；Label Studio 不放这里）
   splits/               # 由 scripts/split_dataset.py 生成
   categories.yaml       # 类别清单，唯一真源
 ```
@@ -20,12 +20,14 @@ data/
 
 | 交付 | 路径 | 消费方 |
 |---|---|---|
-| 自采照片 | `data/raw/<场景>_<日期>/` | 仅本模块 |
+| 待标注照片 | `project/tools/labelstudio/images/`（仓库外，不入库） | Label Studio |
 | 标注产物 | `data/exports/images/` 与 `data/exports/masks/` | 组长验收 |
 | 数据集划分 | `data/splits/{train,val,test}/` | 组员 B 训练、本模块评测 |
 | 指标结果 | `outputs/*_metrics.json` | 组长汇总对比表 |
 
 ## 照片格式要求
+
+照片统一放 `project/tools/labelstudio/images/`，不要直接提交到仓库。`data/raw/` 仅用于可选归档，且已被 git 忽略。
 
 - 格式：`.jpg`（优先）或 `.png`；不使用 iPhone 默认的 `.heic`、`.raw`、`.dng`。
 - 尺寸：保留原图，或统一缩放至长边 1024-2048；同一批次避免混合横竖比例。
@@ -40,7 +42,7 @@ data/
 类别定义以 `data/categories.yaml` 为准，本文件仅作说明。
 
 - `0` 背景；`1-4` 为评测目标类；`5 other` 为兜底类；`255 ignore` 不参与计算。
-- 总量建议 80-120 张（4 类合计），依靠单图多实例扩到 300 个以上 mask；先完成最小闭环，再扩充规模。
+- 总量建议 80-120 张（4 类合计），单图 3-8 个实例，实际可得到约 400-600 个标注实例；先完成最小闭环，再扩充规模。
 
 ### 目标类之外的食物
 
@@ -90,20 +92,23 @@ Label Studio 中未覆盖区域自动视为背景 0，因此「不标」即等�
 
 ## 标注步骤
 
-```bash
-# 1. 启动 Label Studio
-pip install label-studio
-label-studio start
+完整操作见 [`../docs/labelstudio.md`](../docs/labelstudio.md)。最小流程：
 
-# 2. 使用 brush / rectangle 绘制 mask，导出 PNG，文件名与图片对应
-#    <img_id>.jpg  <->  <img_id>.png
-#    图片输出至 data/exports/images/，mask 输出至 data/exports/masks/
+1. 在独立环境安装 Label Studio：`pip install label-studio`，不要装进项目 `.venv`。
+2. 把照片放入 `project/tools/labelstudio/images/`，在仓库根目录双击 `scripts/start_labelstudio.bat` 启动。
+3. 按 [`../docs/labelstudio.md`](../docs/labelstudio.md) 的配置建立项目，使用多边形逐类标注。
+4. 导出 **JSON** 到 `project/tools/labelstudio/exports/`。
+5. 转成 PNG mask：
 
-# 3. 规整为 0..5 类别（原始导出自动备份为 <name>_raw.png，可重复执行）
-python scripts/convert_masks.py --src data/exports/masks --dst data/exports/masks
+```powershell
+python scripts\labelstudio_to_masks.py --export ..\tools\labelstudio\exports\project.json --image-dir ..\tools\labelstudio\images --out data\exports
+```
 
-# 4. 划分数据集（7:1:2）
-python scripts/split_dataset.py --data-dir data/exports --out data/splits
+6. 校验并划分：
+
+```powershell
+python scripts\validate_dataset.py --data-dir data\exports
+python scripts\split_dataset.py --data-dir data\exports --out data\splits
 ```
 
 > 划分必须按图片维度进行。同一张图的 mask 不得分散到 train 与 test，否则构成数据泄漏。

@@ -28,6 +28,7 @@
 
 | 模块 | 用途 |
 |---|---|
+| `scripts/labelstudio_to_masks.py` | 将 Label Studio 导出的 JSON 转成 `data/exports/{images,masks}` |
 | `scripts/split_dataset.py` | 将 `data/exports` 划分为 `data/splits/{train,val,test}` |
 | `model/zero_shot_inference.py` | 加载 SAM，按每个 GT mask 的中心点完成 zero-shot 推理 |
 | `evaluation/evaluate.py` | 对齐 GT 与预测 mask，输出 mIoU / Dice / 边界 F1 |
@@ -43,7 +44,7 @@
 
 ## 推进顺序
 
-1. 组员 A：整理自采照片与标注，使用 `scripts/split_dataset.py` 产出 `data/splits/{train,val,test}`。
+1. 组员 A：按 [`docs/labelstudio.md`](./docs/labelstudio.md) 用 Label Studio 标注，导出 JSON 后用 `scripts/labelstudio_to_masks.py` 转成 PNG mask，再划分 `data/splits/{train,val,test}`。
 2. 组员 B：安装 `model/requirements.txt`，下载权重，在 `val` 上运行 `model/zero_shot_inference.py`。
 3. 组员 A：运行 `evaluation/evaluate.py`，产出第一份 `outputs/zero_shot_metrics.json` 基线。
 4. 组员 B：实现 `model/train_lora.py` 的训练循环。
@@ -71,7 +72,7 @@
 
 ## 环境准备
 
-统一使用仓库根目录的 `.venv`，PyCharm 的解释器也指向它。三个人装同一套依赖，避免版本漂移。
+训练和评测统一使用仓库根目录的 `.venv`，PyCharm 的解释器也指向它。三个人装同一套依赖，避免版本漂移。Label Studio 是唯一例外，装在仓库外的独立环境，避免 Django 等依赖污染训练环境。
 
 ```bash
 python -m venv .venv
@@ -81,7 +82,7 @@ pip install -r requirements.txt
 
 | 角色 | 额外安装 |
 |---|---|
-| 组员 A | 无，`requirements.txt` 够用 |
+| 组员 A | Label Studio（装在独立环境，见 [`docs/labelstudio.md`](./docs/labelstudio.md)） |
 | 组员 B | `pip install -r model/requirements.txt` |
 | 组长（要跑 UI） | `pip install -r app/requirements.txt` |
 
@@ -108,6 +109,7 @@ python -c "import torch, segment_anything; print(torch.__version__, torch.cuda.i
 | [`team-plan.md`](./team-plan.md) | 分工、贡献值、周计划、风险预案 | 组长 |
 | [`docs/project-brief.md`](./docs/project-brief.md) | 课程 PDF 原文逐条摘录 | 组长 |
 | [`docs/data-protocol.md`](./docs/data-protocol.md) | 目录、命名、类别契约（唯一真源） | 组长 |
+| [`docs/labelstudio.md`](./docs/labelstudio.md) | Label Studio 安装、标注、导出、转 mask | 组员 A |
 | [`docs/architecture.md`](./docs/architecture.md) | 端到端流程与模块边界 | 组长 |
 | [`docs/experiment-plan.md`](./docs/experiment-plan.md) | 三个实验怎么设计 | 组长 |
 | [`docs/report/`](./docs/report) | 最终报告分章草稿 | 全员写，组长串稿 |

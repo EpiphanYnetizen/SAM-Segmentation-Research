@@ -20,12 +20,22 @@ data/splits/{train,val,test}/
 
 以 `data/categories.yaml` 为唯一真源。当前：1 meat / 2 fish / 3 vegetable / 4 rice / 5 other。
 
-标注细则（哪些该标、哪些不标）见 [`../data/README.md`](../data/README.md)，本文件不重复。
+标注细则（哪些该标、哪些不标）见 [`../data/README.md`](../data/README.md)，本文件不重复。Label Studio 的具体操作见 [`labelstudio.md`](./labelstudio.md)。
+
+## 标注来源与测试集隔离
+
+- 所有进入 `data/splits` 的 GT 必须由人手工标注。
+- 测试集禁止使用 SAM 输出、自动 mask、其他模型预测或任何预标注结果作为 GT。
+- 允许用模型结果做标注前预览，但最终 mask 必须逐像素人工确认；测试集建议完全不使用预标注。
+- 违反上述规则会使测试集不再独立，zero-shot 与 fine-tuned 的对比结果无效。
+
+Label Studio 导出的 JSON 必须经 `scripts/labelstudio_to_masks.py` 转换后才能进入 `data/exports`。不要手工把 Label Studio 截图或整图 PNG 当作 mask。
 
 ## 接口契约
 
 | 接口 | 路径 | 谁产出 | 谁消费 |
 |---|---|---|---|
+| Label Studio 导出 | `project/tools/labelstudio/exports/*.json` | 组员 A | `scripts/labelstudio_to_masks.py` |
 | 标注产物 | `data/exports/{images,masks}/` | 组员 A | 组长验收 |
 | 数据集划分 | `data/splits/{train,val,test}/` | 组员 A | 组员 B、组长 |
 | 推理结果 | `outputs/<run>/` | 组员 B、组长 | 组员 A 评测、组长 UI |
