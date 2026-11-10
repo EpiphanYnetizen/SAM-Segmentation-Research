@@ -32,25 +32,34 @@
 | `scripts/validate_dataset.py` | 校验图片与 mask 配套、尺寸一致、类别合法、重复图片 |
 | `scripts/split_dataset.py` | 将 `data/exports` 划分为 `data/splits/{train,val,test}` |
 | `scripts/convert_masks.py` | 将其他工具导出的 PNG mask 规整为 0..5 类别（Label Studio 流程不需要） |
-| `model/zero_shot_inference.py` | 加载 SAM，按每个 GT mask 的中心点完成 zero-shot 推理 |
+| `model/zero_shot_inference.py` | 加载 SAM 按 GT 单点提示推理；`--lora-dir` / `--decoder-ckpt` 可评测两条微调分支 |
 | `evaluation/evaluate.py` | 对齐 GT 与预测 mask，输出 mIoU / Dice / 边界 F1 |
 | `scripts/run_ablation.py` | 汇总多份评测结果，生成 Markdown 对比表 |
+| `model/quick_demo.py` | 不依赖标注，单图验证权重与显卡（点提示或自动模式） |
 
-### 待实现（当前为框架代码，尚未接入训练）
+### 待实现（脚手架已就位，训练循环和 UI 推理未接）
 
-| 模块 | 待办 |
-|---|---|
-| `model/train_lora.py` | 组员 B 补充 image encoder LoRA 训练循环 |
-| `model/train_mask_decoder.py` | 组长补充 mask decoder 微调训练循环 |
-| `app/main.py` | Gradio 界面可启动，需将 `render_mask()` 接入真实 SAM 推理 |
+| 模块 | 已有 | 待办 | 负责人 |
+|---|---|---|---|
+| `model/train_lora.py` | 配置加载、LoRA 注入、`--check` 自检 | 训练循环、checkpoint 保存 | 组员 B |
+| `model/train_mask_decoder.py` | 配置加载、冻结策略、`--check` 自检 | 训练循环、checkpoint 保存 | 组长 |
+| `app/main.py` | Gradio 界面与启动参数 | 把点击坐标接到 `sam_runtime.predict_with_prompt` | 组长 |
+
+未实现的部分会明确报错退出，不会静默输出全零结果。训练前先跑自检：
+
+```powershell
+python model\train_lora.py --check
+python model\train_mask_decoder.py --check
+```
 
 ## 推进顺序
 
 1. 组员 A：按 [`data/README.md`](./data/README.md) 用 Label Studio 标注，导出 JSON 后用 `scripts/labelstudio_to_masks.py` 转成 PNG mask，再划分 `data/splits/{train,val,test}`。
 2. 组员 B：安装 `model/requirements.txt`，下载权重，在 `val` 上运行 `model/zero_shot_inference.py`。
 3. 组员 A：运行 `evaluation/evaluate.py`，产出第一份 `outputs/zero_shot_metrics.json` 基线。
-4. 组员 B：实现 `model/train_lora.py` 的训练循环。
-5. 组长：实现 `model/train_mask_decoder.py`，并完成 `app/main.py` 的真实推理接入。
+4. 组员 B：`python model\train_lora.py --check` 通过后，补训练循环，产出 `checkpoints/lora/encoder/<run_id>/`。
+5. 组长：`python model\train_mask_decoder.py --check` 通过后，补训练循环，产出 `checkpoints/lora/mask_decoder/<run_id>/mask_decoder.pth`。
+6. 组长：把 `app/main.py` 接到 `model/sam_runtime.py`，完成点提示演示。
 
 > `data/exports/images`、`data/exports/masks`、`data/annotations`、`data/splits` 已建好；空目录用 `.gitkeep` 占位，真实数据不会进 Git。
 
@@ -69,6 +78,10 @@ python scripts\split_dataset.py --data-dir data\exports --out data\splits
 python model\zero_shot_inference.py --checkpoint checkpoints\sam_vit_b_01ec64.pth --data-dir data\splits\val --out outputs\zero_shot
 python evaluation\evaluate.py --gt data\splits\val --pred outputs\zero_shot --out outputs\zero_shot_metrics.json
 
+# 微调后推理（二选一）
+python model\zero_shot_inference.py --data-dir data\splits\val --lora-dir checkpoints\lora\encoder\<run_id> --out outputs\finetuned
+python model\zero_shot_inference.py --data-dir data\splits\val --decoder-ckpt checkpoints\lora\mask_decoder\<run_id>\mask_decoder.pth --out outputs\mask_decoder_v1
+
 # 汇总对比表
 python scripts\run_ablation.py --metrics outputs\zero_shot_metrics.json outputs\finetuned_metrics.json --out outputs\ablation_table.md
 ```
@@ -78,20 +91,23 @@ python scripts\run_ablation.py --metrics outputs\zero_shot_metrics.json outputs\
 | 日期 | 事项 | 状态 |
 |---|---|---|
 | 10/11 | 报名邮件，主题 `深度学习_黄闻喆_曹庆科_葛瀚然_选题_2` | 已发送 |
-| **10/25** | **交 `开题报告.ppt`（恰好 3 页）+ `开题报告.mp4`（3 分钟）** | 硬截止，进行中 |
-| 10/25 后 | zero-shot 跑通 → 双分支 LoRA → 消融 → 最终报告 | 未开始 |
+| **10/25** | **交 `开题报告.ppt`（恰好 3 页）+ `开题报告.mp4`（3 分钟）** | 已完成（成品在本地，按课程要求单独提交） |
+| 10/25 后 | zero-shot 跑通 → 双分支微调 → 消融 → 最终报告 | 进行中 |
 
-开题材料在 10/24 前定稿，10/25 当天发送。
+提交物（PPT、视频、演讲稿）不进 Git，组内自行备份。
 
 ## 进度看板
 
 - [x] 仓库骨架、分工、接口契约
 - [x] 报名邮件已发送
+- [x] 开题 PPT（3 页）+ 视频（3 分钟）
+- [x] 数据工具链（JSON 转 mask → 校验 → 7:1:2 划分）
+- [x] zero-shot 推理脚本与评测指标
 - [ ] 组员 A：自采 80-120 张并标注（目标 400-600 个实例）
-- [ ] 组员 B：跑通 SAM zero-shot
-- [ ] 组长：mask decoder 微调 + 消融
+- [ ] 组员 B：补 `train_lora.py` 训练循环，产出 encoder LoRA
+- [ ] 组长：补 `train_mask_decoder.py` 训练循环并接入 UI
 - [ ] 三人：`zero-shot vs fine-tuned` 对比表
-- [ ] 开题 PPT（3 页）+ 视频（3 分钟）
+- [ ] 最终报告 + 答辩演示
 
 ## 环境准备
 
@@ -166,4 +182,4 @@ python -c "import torch, segment_anything; print(torch.__version__, torch.cuda.i
 | 评测 | NumPy + SciPy，指标在 `evaluation/metrics.py` 自己实现，不用黑盒 |
 | UI | Vue 3 + FastAPI（Gradio 保留为最小演示） |
 | 部署 | 本地 Python；Docker Compose 可选 |
-| 硬件 | 单卡 8G 以上，不够就退到 MobileSAM |
+| 硬件 | 训练建议 ≥8G 显存（不足可租用算力）；4G 显存只够推理和单图 demo |

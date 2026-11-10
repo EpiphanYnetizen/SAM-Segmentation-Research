@@ -1,10 +1,14 @@
 # 前后端设计（可视化 Demo）
 
+> **状态：设计稿，未实现。** 仓库里没有 `app/api/` 和 `app/web/`，
+> 当前可运行的是 `app/main.py`（Gradio 骨架，推理未接入）。
+> 本文描述的是二期方案，按里程碑推进前请先完成模型侧。
+
 本文只描述 `app/` 的内部设计，不改变根 [`README.md`](../README.md) 里的模块边界：`app/` 只读推理结果，不训练、不评测。
 
 ## 0. 当前入口
 
-`app/main.py` 目前是最小 Gradio 演示，`render_mask()` 仍返回全零，尚未接入真实 SAM：
+`app/main.py` 目前是 Gradio 界面骨架，`render_mask()` 尚未接入真实 SAM，提交时会明确报错：
 
 ```bash
 pip install -r app/requirements.txt
@@ -12,7 +16,8 @@ python app/main.py --checkpoint checkpoints/sam_vit_b_01ec64.pth
 # 浏览器访问 http://localhost:7860
 ```
 
-正式 UI 按本文的 Vue + FastAPI 方案推进；Gradio 只保留为最小演示，不再扩展。
+接入推理时只改 `render_mask()` 内部（详见 [`../app/README.md`](../app/README.md)），
+部署参数保持 `--checkpoint` / `--host` / `--port` 不变。本文的 Vue + FastAPI 属于二期方案。
 
 ## 1. 目标与非目标
 
