@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 import argparse
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -46,7 +47,9 @@ def inject_lora(sam_model, cfg: TrainConfig):
         from peft import LoraConfig, get_peft_model
     except ImportError as exc:
         raise SystemExit(
-            "缺少 peft，先执行: pip install -r model/requirements.txt"
+            "当前解释器里没有 peft。\n"
+            f"  当前解释器: {sys.executable}\n"
+            "  用 .venv 安装: .\\.venv\\Scripts\\pip.exe install -r model\\requirements.txt"
         ) from exc
 
     lora = LoraConfig(

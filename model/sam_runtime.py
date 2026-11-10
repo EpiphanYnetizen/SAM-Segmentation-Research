@@ -8,6 +8,7 @@
 """
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -73,7 +74,11 @@ def load_sam(checkpoint: Path, model_type: str = "vit_b", device: str = "cuda"):
         from segment_anything import sam_model_registry
     except ImportError as exc:
         raise SystemExit(
-            "缺少 segment-anything，先执行: pip install -r model/requirements.txt"
+            "当前解释器里没有 segment-anything。\n"
+            f"  当前解释器: {sys.executable}\n"
+            "  正确做法: 用仓库的 .venv 运行，例如\n"
+            "    .\\.venv\\Scripts\\python.exe model\\train_lora.py --check\n"
+            "  确认依赖装在 .venv 里: .\\.venv\\Scripts\\pip.exe install -r model\\requirements.txt"
         ) from exc
 
     checkpoint = Path(checkpoint)
@@ -100,7 +105,9 @@ def load_predictor(
             from peft import PeftModel
         except ImportError as exc:
             raise SystemExit(
-                "缺少 peft，先执行: pip install -r model/requirements.txt"
+                "当前解释器里没有 peft。\n"
+                f"  当前解释器: {sys.executable}\n"
+                "  用 .venv 安装: .\\.venv\\Scripts\\pip.exe install -r model\\requirements.txt"
             ) from exc
         lora_dir = Path(lora_dir)
         if not (lora_dir / "adapter_config.json").is_file():
