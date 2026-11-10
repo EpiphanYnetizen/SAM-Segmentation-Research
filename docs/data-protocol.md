@@ -35,7 +35,7 @@ Label Studio 导出的 JSON 必须经 `scripts/labelstudio_to_masks.py` 转换�
 
 | 接口 | 路径 | 谁产出 | 谁消费 |
 |---|---|---|---|
-| Label Studio 导出 | `project/tools/labelstudio/exports/*.json` | 组员 A | `scripts/labelstudio_to_masks.py` |
+| Label Studio 导出 | 组员 A 自行存放的 JSON（位置不限） | 组员 A | `scripts/labelstudio_to_masks.py` |
 | 标注产物 | `data/exports/{images,masks}/` | 组员 A | 组长验收 |
 | 数据集划分 | `data/splits/{train,val,test}/` | 组员 A | 组员 B、组长 |
 | 推理结果 | `outputs/<run>/` | 组员 B、组长 | 组员 A 评测、组长 UI |

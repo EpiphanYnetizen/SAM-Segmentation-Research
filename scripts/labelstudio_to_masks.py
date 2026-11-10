@@ -8,8 +8,8 @@
 用法::
 
     python scripts/labelstudio_to_masks.py \\
-        --export ../tools/labelstudio/exports/project.json \\
-        --image-dir ../tools/labelstudio/images \\
+        --export path/to/export.json \\
+        --image-dir path/to/images \\
         --out data/exports
 
 输出：

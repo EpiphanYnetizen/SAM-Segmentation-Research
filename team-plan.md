@@ -39,7 +39,7 @@
 | 角色 | 交付 |
 |---|---|
 | PM | 发报名邮件、建仓库、定接口契约、预装依赖、搭建 mask decoder 微调脚手架 |
-| A | 定类别清单（`data/categories.yaml`）、开始自采照片、在仓库外 `tools/labelstudio` 搭好 Label Studio |
+| A | 定类别清单（`data/categories.yaml`）、开始自采照片、在独立环境搭好 Label Studio（数据位置自行安排） |
 | B | 读 SAM 论文、下载 `sam_vit_b` / MobileSAM 权重、跑通官方 demo |
 
 ### W2：10/18 - 10/24
@@ -76,7 +76,7 @@
 |---|---|
 | Research 禁现成 API，除非蒸馏教师模型 | 全部本地 SAM/SAM2 推理与后训练 |
 | 至少 SFT/RLHF/OPD/OPSD 其一，通常 LoRA | LoRA 微调 mask decoder / image encoder |
-| 自采数据 + 自定义类别，加 5-10 分 | `project/tools/labelstudio/images` 自采（可归档到 `data/raw`）+ `data/categories.yaml` |
+| 自采数据 + 自定义类别，加 5-10 分 | 自采照片（位置不限，不入库）+ `data/categories.yaml` |
 | 3 页 PPT：题目成员 / 数据来源 / 模型改进 | 10/25 前由 PM 交付 `开题报告.ppt` |
 | 3 分钟视频 | 10/25 前由 PM 交付 `开题报告.mp4`，演讲稿单独保存、不进仓库 |
 
@@ -100,7 +100,7 @@
 
 | 项 | 方案 |
 |---|---|
-| 标注 | Label Studio（独立 Python 环境，数据放 `project/tools/labelstudio`） |
+| 标注 | Label Studio（独立环境，标注数据不入库） |
 | GPU | 自用电脑、院里免费资源、Colab/Kaggle 免费额度 |
 | 文档 | Markdown + Git，最后由组长生成 PPT/PDF |
 | 视频 | 录屏 + 剪映，以内容完整为准 |

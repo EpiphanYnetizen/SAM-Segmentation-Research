@@ -72,7 +72,7 @@
 
 ## 环境准备
 
-训练和评测统一使用仓库根目录的 `.venv`，PyCharm 的解释器也指向它。三个人装同一套依赖，避免版本漂移。Label Studio 是唯一例外，装在仓库外的独立环境，避免 Django 等依赖污染训练环境。
+训练和评测统一使用仓库根目录的 `.venv`，PyCharm 的解释器也指向它。三个人装同一套依赖，避免版本漂移。Label Studio 是唯一例外，建议装在独立环境，避免 Django 等依赖污染训练环境。
 
 ```bash
 python -m venv .venv
@@ -82,7 +82,7 @@ pip install -r requirements.txt
 
 | 角色 | 额外安装 |
 |---|---|
-| 组员 A | Label Studio（装在独立环境，见 [`docs/labelstudio.md`](./docs/labelstudio.md)） |
+| 组员 A | Label Studio（建议独立环境，见 [`docs/labelstudio.md`](./docs/labelstudio.md)） |
 | 组员 B | `pip install -r model/requirements.txt` |
 | 组长（要跑 UI） | `pip install -r app/requirements.txt` |
 
@@ -109,7 +109,7 @@ python -c "import torch, segment_anything; print(torch.__version__, torch.cuda.i
 | [`team-plan.md`](./team-plan.md) | 分工、贡献值、周计划、风险预案 | 组长 |
 | [`docs/project-brief.md`](./docs/project-brief.md) | 课程 PDF 原文逐条摘录 | 组长 |
 | [`docs/data-protocol.md`](./docs/data-protocol.md) | 目录、命名、类别契约（唯一真源） | 组长 |
-| [`docs/labelstudio.md`](./docs/labelstudio.md) | Label Studio 安装、标注、导出、转 mask | 组员 A |
+| [`docs/labelstudio.md`](./docs/labelstudio.md) | Label Studio 导出 JSON 转类别 mask | 组员 A |
 | [`docs/architecture.md`](./docs/architecture.md) | 端到端流程与模块边界 | 组长 |
 | [`docs/experiment-plan.md`](./docs/experiment-plan.md) | 三个实验怎么设计 | 组长 |
 | [`docs/report/`](./docs/report) | 最终报告分章草稿 | 全员写，组长串稿 |

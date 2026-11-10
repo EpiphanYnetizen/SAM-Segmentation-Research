@@ -5,8 +5,8 @@
 ## 端到端流程
 
 ```text
-待标注照片 project/tools/labelstudio/images
-  -> Label Studio 标注 -> project/tools/labelstudio/exports/*.json
+待标注照片（位置不限，不入库）
+  -> Label Studio 标注 -> JSON
   -> scripts/labelstudio_to_masks.py -> data/exports/{images,masks}
   -> scripts/split_dataset.py -> data/splits/{train,val,test}
         |
@@ -29,7 +29,7 @@ app/main.py 只读 checkpoints/ 和 outputs/
 
 ## 模块边界（越界操作是返工的主要来源）
 
-- `data/`：不碰模型，只生产 splits；Label Studio 的运行数据和导出 JSON 放在仓库外 `project/tools/labelstudio`。
+- `data/`：不碰模型，只生产 splits；标注工具装在哪、原始 JSON 放哪由组员 A 自行安排，仓库只接收转换后的 `data/exports`。
 - `model/`：不算指标，只生产 mask 和 checkpoint。
 - `evaluation/`：不碰模型，只消费 GT 和预测 mask。
 - `app/`：只读 `model/` 的推理函数和 `outputs/`。

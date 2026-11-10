@@ -1,10 +1,11 @@
-# 公共脚本（组长）
+# 公共脚本
+
+脚本由组长维护，组员 A 直接按命令调用。
 
 原则：脚本以 CLI 形式交付，输入输出路径显式声明，可重复执行。
 
 | 脚本 | 功能 | 使用者 |
 |---|---|---|
-| `start_labelstudio.bat` | 启动仓库外 `project/tools/labelstudio` 中的 Label Studio，并设置 Local Files 根目录 | 组员 A |
 | `labelstudio_to_masks.py` | Label Studio 导出的 JSON → `data/exports/{images,masks}`，按 `categories.yaml` 映射类别 | 组员 A |
 | `split_dataset.py` | 将 `data/exports` 划分为 `data/splits/{train,val,test}`，比例 7:1:2，随机种子固定 | 组员 A |
 | `convert_masks.py` | 将其他工具导出的 PNG mask 规整为 0..5 类别，原始导出备份为 `<name>_raw.png` | 组员 A |
@@ -12,11 +13,8 @@
 | `validate_dataset.py` | 校验图片与 mask 配套、尺寸一致、类别合法、重复图片 | 组员 A / 组长 |
 
 ```powershell
-# 启动标注工具（首次使用先按 docs/labelstudio.md 安装）
-scripts\start_labelstudio.bat
-
-# Label Studio JSON -> PNG mask
-python scripts\labelstudio_to_masks.py --export ..\tools\labelstudio\exports\project.json --image-dir ..\tools\labelstudio\images --out data\exports
+# Label Studio JSON -> PNG mask（JSON 和图片位置不限）
+python scripts\labelstudio_to_masks.py --export <导出的.json> --image-dir <原图目录> --out data\exports
 
 # 校验、划分、汇总
 python scripts\validate_dataset.py --data-dir data\exports

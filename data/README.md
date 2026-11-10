@@ -7,11 +7,11 @@
 
 ```text
 data/
-  raw/                  # 可选归档；主标注目录在仓库外 tools/labelstudio/images
+  raw/                  # 原始照片归档（可选，git 忽略）
   exports/              # 标注产物，下游只读
     images/xxx.jpg
     masks/xxx.png       # 单通道 uint8：0 背景，1..5 类别，255 ignore
-  annotations/          # 其他标注工具的原始导出（git 忽略；Label Studio 不放这里）
+  annotations/          # 标注工具的原始导出（可选，git 忽略）
   splits/               # 由 scripts/split_dataset.py 生成
   categories.yaml       # 类别清单，唯一真源
 ```
@@ -20,14 +20,14 @@ data/
 
 | 交付 | 路径 | 消费方 |
 |---|---|---|
-| 待标注照片 | `project/tools/labelstudio/images/`（仓库外，不入库） | Label Studio |
+| 待标注照片 | 由你自行存放，不要提交到 Git | Label Studio |
 | 标注产物 | `data/exports/images/` 与 `data/exports/masks/` | 组长验收 |
 | 数据集划分 | `data/splits/{train,val,test}/` | 组员 B 训练、本模块评测 |
 | 指标结果 | `outputs/*_metrics.json` | 组长汇总对比表 |
 
 ## 照片格式要求
 
-照片统一放 `project/tools/labelstudio/images/`，不要直接提交到仓库。`data/raw/` 仅用于可选归档，且已被 git 忽略。
+照片放在你自己的目录，不要直接提交到仓库。如果需要在仓库内归档，放 `data/raw/`，该目录已被 git 忽略。
 
 - 格式：`.jpg`（优先）或 `.png`；不使用 iPhone 默认的 `.heic`、`.raw`、`.dng`。
 - 尺寸：保留原图，或统一缩放至长边 1024-2048；同一批次避免混合横竖比例。
@@ -95,13 +95,13 @@ Label Studio 中未覆盖区域自动视为背景 0，因此「不标」即等�
 完整操作见 [`../docs/labelstudio.md`](../docs/labelstudio.md)。最小流程：
 
 1. 在独立环境安装 Label Studio：`pip install label-studio`，不要装进项目 `.venv`。
-2. 把照片放入 `project/tools/labelstudio/images/`，在仓库根目录双击 `scripts/start_labelstudio.bat` 启动。
+2. 准备照片并用 Label Studio 标注；照片和 Label Studio 项目放在哪里由你安排。
 3. 按 [`../docs/labelstudio.md`](../docs/labelstudio.md) 的配置建立项目，使用多边形逐类标注。
-4. 导出 **JSON** 到 `project/tools/labelstudio/exports/`。
+4. 导出 **JSON**，文件位置不限。
 5. 转成 PNG mask：
 
 ```powershell
-python scripts\labelstudio_to_masks.py --export ..\tools\labelstudio\exports\project.json --image-dir ..\tools\labelstudio\images --out data\exports
+python scripts\labelstudio_to_masks.py --export <导出的.json> --image-dir <原图目录> --out data\exports
 ```
 
 6. 校验并划分：
