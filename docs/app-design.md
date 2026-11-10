@@ -1,6 +1,18 @@
 # 前后端设计（可视化 Demo）
 
-本文只描述 `app/` 的内部设计，不改变 `docs/architecture.md` 的模块边界：`app/` 只读推理结果，不训练、不评测。
+本文只描述 `app/` 的内部设计，不改变根 [`README.md`](../README.md) 里的模块边界：`app/` 只读推理结果，不训练、不评测。
+
+## 0. 当前入口
+
+`app/main.py` 目前是最小 Gradio 演示，`render_mask()` 仍返回全零，尚未接入真实 SAM：
+
+```bash
+pip install -r app/requirements.txt
+python app/main.py --checkpoint checkpoints/sam_vit_b_01ec64.pth
+# 浏览器访问 http://localhost:7860
+```
+
+正式 UI 按本文的 Vue + FastAPI 方案推进；Gradio 只保留为最小演示，不再扩展。
 
 ## 1. 目标与非目标
 
@@ -276,3 +288,19 @@ GPU 通过 compose 的 device reservation 暴露；Windows 上需要 Docker Desk
 - 自动模式响应体可能很大：限制返回前 12 个 mask。
 - 4G 显存：只允许单请求；批量评测不要走这个 API，直接跑离线脚本。
 - Gradio 版本保留但不再演进，避免两套 UI 同时维护。
+
+## 12. Docker
+
+Docker 的目标是把正式 UI 打包，便于答辩现场和其他成员复现。优先级在模型可运行之后。
+
+```bash
+docker compose -f docker/docker-compose.yml up --build
+# 浏览器访问 http://localhost:7860
+```
+
+注意：
+
+- 权重不打包进镜像，通过 volume 挂载：宿主机 `checkpoints/` -> 容器 `/workspace/checkpoints`（只读）。
+- 容器内服务监听 `0.0.0.0`；`Dockerfile.app` 的 CMD 已配置 `--host 0.0.0.0`，需保留。
+- 构建上下文是仓库根目录，`.dockerignore` 已排除 `checkpoints/`、`data/raw/`、`outputs/`、`.venv/` 等；新增体积大的目录时同步更新。
+- 本仓库不使用 `.env` 或 `env_file`，权重路径通过 volume 与 CLI 参数指定。

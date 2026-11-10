@@ -20,7 +20,7 @@ data/splits/{train,val,test}/
 
 以 `data/categories.yaml` 为唯一真源。当前：1 meat / 2 fish / 3 vegetable / 4 rice / 5 other。
 
-标注细则（哪些该标、哪些不标）见 [`../data/README.md`](../data/README.md)，本文件不重复。Label Studio 的具体操作见 [`labelstudio.md`](./labelstudio.md)。
+标注细则、Label Studio 配置与 JSON 转换命令见 [`../data/README.md`](../data/README.md)，本文件不重复。
 
 ## 标注来源与测试集隔离
 

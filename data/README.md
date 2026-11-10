@@ -90,28 +90,111 @@ data/
 
 Label Studio 中未覆盖区域自动视为背景 0，因此「不标」即等同于「作背景」，无需额外处理。
 
-## 标注步骤
+## 标注与转换
 
-完整操作见 [`../docs/labelstudio.md`](../docs/labelstudio.md)。最小流程：
+Label Studio 装在哪里、照片放在哪里、用 pip 还是 Docker 启动，由你按自己的习惯安排，仓库不做限制。仓库只接收转换后的 `data/exports/{images,masks}`。
 
-1. 在独立环境安装 Label Studio：`pip install label-studio`，不要装进项目 `.venv`。
-2. 准备照片并用 Label Studio 标注；照片和 Label Studio 项目放在哪里由你安排。
-3. 按 [`../docs/labelstudio.md`](../docs/labelstudio.md) 的配置建立项目，使用多边形逐类标注。
-4. 导出 **JSON**，文件位置不限。
-5. 转成 PNG mask：
+### 类别
+
+类别以 [`categories.yaml`](./categories.yaml) 为准：
+
+| 像素值 | 标签值 | 含义 |
+|---|---|---|
+| 0 | 背景 | 不标即可 |
+| 1 | `meat` | 肉块 |
+| 2 | `fish` | 鱼块 |
+| 3 | `vegetable` | 青菜 |
+| 4 | `rice` | 米饭 |
+| 5 | `other` | 其他食物 |
+| 255 | `ignore` | 不确定，评测跳过 |
+
+Label Studio 里的标签值必须和上表的英文名一致，转换脚本按这个名字映射像素值。
+
+### 标注
+
+建议单独建一个环境安装 Label Studio，不要装进项目 `.venv`：
+
+```powershell
+pip install label-studio
+```
+
+新建项目后，在 **Labeling Interface → Code** 中粘贴：
+
+```xml
+<labeling>
+  <image name="image" value="$image" zoom="true" zoomControl="true"/>
+  <polygonlabels name="label" toName="image" strokeWidth="2">
+    <label value="meat" background="#DC143C"/>
+    <label value="fish" background="#1E90FF"/>
+    <label value="vegetable" background="#228B22"/>
+    <label value="rice" background="#FFD700"/>
+    <label value="other" background="#FFA500"/>
+    <label value="ignore" background="#808080"/>
+  </polygonlabels>
+</labeling>
+```
+
+推荐用多边形。菜品边界不规则时，多边形比矩形更贴近真实轮廓。如果更习惯画笔，把 `<polygonlabels ...>` 换成 `<brushlabels name="label" toName="image">`，标签行不变。不要同一张图混用两种方式。
+
+标注时遵守上一节的取舍规则。核心原则是**不追求标得最多，追求同一个人重标时结果一致**。
+
+### 导出 JSON
+
+标注完成后，在项目页选择 **Export → JSON**。
+
+- 不要选 JSON-MIN、CSV 或 COCO。
+- 导出文件放在哪里都可以，只要下一步的 `--export` 指得到。
+- 图片如果是拖拽上传进 Label Studio 的，转换时需要额外知道 Label Studio 的 data 目录；这个目录就是启动时 `--data-dir` 指向的位置。
+
+### 转成 PNG mask
+
+在仓库根目录执行：
 
 ```powershell
 python scripts\labelstudio_to_masks.py --export <导出的.json> --image-dir <原图目录> --out data\exports
 ```
 
-6. 校验并划分：
+如果图片是上传进 Label Studio 的，加 `--ls-data-dir`：
+
+```powershell
+python scripts\labelstudio_to_masks.py --export <导出的.json> --image-dir <原图目录> --ls-data-dir <Label Studio 的 data 目录> --out data\exports
+```
+
+常用参数：
+
+| 参数 | 作用 |
+|---|---|
+| `--export` | Label Studio 导出的 JSON，必填 |
+| `--image-dir` | 原图所在目录 |
+| `--ls-data-dir` | Label Studio 的 data 目录，仅上传图片时需要 |
+| `--out` | 输出目录，默认 `data/exports` |
+| `--overwrite` | 覆盖已有图片和 mask；修改标注后重新导出时使用 |
+| `--skip-empty` | 跳过没有任何区域的图片 |
+| `--unknown-label other` | 未知标签归到 `other`，默认直接报错 |
+
+脚本支持多边形、画笔 RLE、矩形三种区域，会处理图片 EXIF 方向，并对同名图片、未知标签、旋转标注直接报错。
+
+输出：
+
+```text
+data/exports/images/<图片名>.jpg
+data/exports/masks/<图片名>.png
+```
+
+mask 是单通道 `uint8`：`0` 背景，`1-5` 类别，`255` ignore。
+
+### 校验与划分
 
 ```powershell
 python scripts\validate_dataset.py --data-dir data\exports
 python scripts\split_dataset.py --data-dir data\exports --out data\splits
 ```
 
-> 划分必须按图片维度进行。同一张图的 mask 不得分散到 train 与 test，否则构成数据泄漏。
+校验必须显示 `校验通过`。划分按图片进行，同一张图的 image 和 mask 会进入同一个 split。
+
+### 测试集规定
+
+测试集 GT 必须 100% 人工标注。禁止用 SAM 输出、自动 mask 或其他模型结果直接作为测试集 GT；允许用模型结果做辅助预览，但最终每个像素必须由人确认。否则测试集不再独立，评测结果无效。
 
 ## 下一步
 

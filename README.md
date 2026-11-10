@@ -29,7 +29,9 @@
 | 模块 | 用途 |
 |---|---|
 | `scripts/labelstudio_to_masks.py` | 将 Label Studio 导出的 JSON 转成 `data/exports/{images,masks}` |
+| `scripts/validate_dataset.py` | 校验图片与 mask 配套、尺寸一致、类别合法、重复图片 |
 | `scripts/split_dataset.py` | 将 `data/exports` 划分为 `data/splits/{train,val,test}` |
+| `scripts/convert_masks.py` | 将其他工具导出的 PNG mask 规整为 0..5 类别（Label Studio 流程不需要） |
 | `model/zero_shot_inference.py` | 加载 SAM，按每个 GT mask 的中心点完成 zero-shot 推理 |
 | `evaluation/evaluate.py` | 对齐 GT 与预测 mask，输出 mIoU / Dice / 边界 F1 |
 | `scripts/run_ablation.py` | 汇总多份评测结果，生成 Markdown 对比表 |
@@ -44,11 +46,29 @@
 
 ## 推进顺序
 
-1. 组员 A：按 [`docs/labelstudio.md`](./docs/labelstudio.md) 用 Label Studio 标注，导出 JSON 后用 `scripts/labelstudio_to_masks.py` 转成 PNG mask，再划分 `data/splits/{train,val,test}`。
+1. 组员 A：按 [`data/README.md`](./data/README.md) 用 Label Studio 标注，导出 JSON 后用 `scripts/labelstudio_to_masks.py` 转成 PNG mask，再划分 `data/splits/{train,val,test}`。
 2. 组员 B：安装 `model/requirements.txt`，下载权重，在 `val` 上运行 `model/zero_shot_inference.py`。
 3. 组员 A：运行 `evaluation/evaluate.py`，产出第一份 `outputs/zero_shot_metrics.json` 基线。
 4. 组员 B：实现 `model/train_lora.py` 的训练循环。
 5. 组长：实现 `model/train_mask_decoder.py`，并完成 `app/main.py` 的真实推理接入。
+
+## 常用命令
+
+```powershell
+# 标注 JSON -> PNG mask（JSON 和图片位置不限）
+python scripts\labelstudio_to_masks.py --export <导出的.json> --image-dir <原图目录> --out data\exports
+
+# 校验、划分
+python scripts\validate_dataset.py --data-dir data\exports
+python scripts\split_dataset.py --data-dir data\exports --out data\splits
+
+# zero-shot 推理、评测
+python model\zero_shot_inference.py --checkpoint checkpoints\sam_vit_b_01ec64.pth --data-dir data\splits\val --out outputs\zero_shot
+python evaluation\evaluate.py --gt data\splits\val --pred outputs\zero_shot --out outputs\zero_shot_metrics.json
+
+# 汇总对比表
+python scripts\run_ablation.py --metrics outputs\zero_shot_metrics.json outputs\finetuned_metrics.json --out outputs\ablation_table.md
+```
 
 ## 硬节点
 
@@ -82,7 +102,7 @@ pip install -r requirements.txt
 
 | 角色 | 额外安装 |
 |---|---|
-| 组员 A | Label Studio（建议独立环境，见 [`docs/labelstudio.md`](./docs/labelstudio.md)） |
+| 组员 A | Label Studio（建议独立环境，见 [`data/README.md`](./data/README.md)） |
 | 组员 B | `pip install -r model/requirements.txt` |
 | 组长（要跑 UI） | `pip install -r app/requirements.txt` |
 
@@ -102,6 +122,14 @@ python -c "import torch, segment_anything; print(torch.__version__, torch.cuda.i
 4. 大文件一律不进 git：模型权重、原始照片、视频、PPT、checkpoints 都已写进 `.gitignore`。
 5. 交付物命名严格按课程要求：`开题报告.ppt`、`开题报告.mp4`。
 
+## 模块边界
+
+- `data/`：只生产 `data/splits`，不碰模型。
+- `model/`：只生产预测 mask 和 checkpoint，不算指标。
+- `evaluation/`：只消费 GT 和预测 mask，产出 metrics JSON。
+- `app/`：只读模型推理接口和 `outputs/`，不训练、不评测。
+- `scripts/`：共享编排脚本，输入输出用 CLI 参数显式声明。
+
 ## 文档地图
 
 | 文件 | 内容 | 谁维护 |
@@ -109,10 +137,20 @@ python -c "import torch, segment_anything; print(torch.__version__, torch.cuda.i
 | [`team-plan.md`](./team-plan.md) | 分工、贡献值、周计划、风险预案 | 组长 |
 | [`docs/project-brief.md`](./docs/project-brief.md) | 课程 PDF 原文逐条摘录 | 组长 |
 | [`docs/data-protocol.md`](./docs/data-protocol.md) | 目录、命名、类别契约（唯一真源） | 组长 |
-| [`docs/labelstudio.md`](./docs/labelstudio.md) | Label Studio 导出 JSON 转类别 mask | 组员 A |
-| [`docs/architecture.md`](./docs/architecture.md) | 端到端流程与模块边界 | 组长 |
 | [`docs/experiment-plan.md`](./docs/experiment-plan.md) | 三个实验怎么设计 | 组长 |
+| [`docs/app-design.md`](./docs/app-design.md) | UI/API/Docker 设计 | 组长 |
 | [`docs/report/`](./docs/report) | 最终报告分章草稿 | 全员写，组长串稿 |
+
+## 报告分章
+
+| 章节 | 文件 | 负责人 |
+|---|---|---|
+| 1 背景与问题定义 | [`docs/report/background.md`](./docs/report/background.md) | 组长 |
+| 2 数据来源与预处理 | 待建 `docs/report/data.md` | 组员 A |
+| 3 方法与改进 | [`docs/report/method.md`](./docs/report/method.md) | 组员 B + 组长 |
+| 4 实验设计与指标 | 待建 `docs/report/experiments.md` | 组长 |
+| 5 结果与失败案例 | [`docs/report/results.md`](./docs/report/results.md) | 组员 A |
+| 6 讨论与结论 | 待建 `docs/report/discussion.md` | 组长 |
 
 ## 技术栈
 
@@ -122,6 +160,6 @@ python -c "import torch, segment_anything; print(torch.__version__, torch.cuda.i
 | 微调 | PyTorch + `peft`（LoRA） |
 | 标注 | Label Studio |
 | 评测 | NumPy + SciPy，指标在 `evaluation/metrics.py` 自己实现，不用黑盒 |
-| UI | Gradio |
+| UI | Vue 3 + FastAPI（Gradio 保留为最小演示） |
 | 部署 | 本地 Python；Docker Compose 可选 |
 | 硬件 | 单卡 8G 以上，不够就退到 MobileSAM |
