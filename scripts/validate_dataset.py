@@ -13,7 +13,7 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 
-IMAGE_EXTS = {".jpg", ".jpeg", ".png"}
+IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".bmp", ".webp"}
 ALLOWED_LABELS = {0, 1, 2, 3, 4, 5, 255}
 LABEL_NAMES = {
     0: "background",

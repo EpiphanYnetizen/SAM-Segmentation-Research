@@ -30,6 +30,7 @@ def main() -> None:
         lines.append(
             f"| {row['run']} | {row['mIoU']:.3f} | {row['meanDice']:.3f} | {row['meanBoundaryF1']:.3f} |"
         )
+    args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(f"wrote {args.out}")
 
