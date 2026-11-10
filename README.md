@@ -141,6 +141,7 @@ python -c "import torch, segment_anything; print(torch.__version__, torch.cuda.i
 | [`docs/project-brief.md`](./docs/project-brief.md) | 课程 PDF 原文逐条摘录 | 组长 |
 | [`docs/data-protocol.md`](./docs/data-protocol.md) | 目录、命名、类别契约（唯一真源） | 组长 |
 | [`docs/experiment-plan.md`](./docs/experiment-plan.md) | 三个实验怎么设计 | 组长 |
+| [`app/README.md`](./app/README.md) | Gradio 最小演示启动 | 组长 |
 | [`docs/app-design.md`](./docs/app-design.md) | UI/API/Docker 设计 | 组长 |
 | [`docs/report/`](./docs/report) | 最终报告分章草稿 | 全员写，组长串稿 |
 
