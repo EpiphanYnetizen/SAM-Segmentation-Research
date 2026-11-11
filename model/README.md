@@ -36,6 +36,11 @@ python model/zero_shot_inference.py --checkpoint checkpoints/sam_vit_b_01ec64.pt
 
 产出 `outputs/zero_shot/`，移交组员 A 评测。
 
+注意：这是 **GT 点提示**（oracle-point）评测，提示点来自 GT mask，不是自动实例分割。
+报告里必须写明提示协议；要回答“SAM 能否自动发现所有菜品”，需要另做网格点或自动
+mask 实验，不能和当前指标混在一起。重叠实例当前按写入顺序覆盖，遮挡场景的类别可能
+有偏差，结果分析时要单独说明。
+
 ### 4. LoRA 微调 image encoder（待补训练循环）
 
 先自检环境和挂载点，输出应类似 `0.5 M 可训练参数`：

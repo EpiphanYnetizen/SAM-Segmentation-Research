@@ -32,11 +32,17 @@ def main() -> None:
     parser.add_argument("--gt", type=Path, default=Path("data/splits/val"))
     parser.add_argument("--pred", type=Path, default=Path("outputs/zero_shot"))
     parser.add_argument("--out", type=Path, default=Path("outputs/zero_shot_metrics.json"))
+    parser.add_argument(
+        "--allow-missing",
+        action="store_true",
+        help="允许 GT 缺少对应预测并跳过；仅用于排查，正式结果不要使用",
+    )
     args = parser.parse_args()
 
     gt_map = find_masks(args.gt, "GT")
     pred_map = find_masks(args.pred, "预测")
     common = sorted(set(gt_map) & set(pred_map))
+    missing = sorted(set(gt_map) - set(pred_map))
     if not common:
         raise SystemExit(
             "GT 与预测没有任何同名 mask，无法评测。\n"
@@ -44,8 +50,18 @@ def main() -> None:
             f"  预测示例: {', '.join(sorted(pred_map)[:5])}\n"
             "检查 --pred 是否指向 outputs/<run>（直接含 PNG），以及文件名是否与 GT 一致。"
         )
-    if len(common) < len(gt_map):
-        print(f"警告: {len(gt_map) - len(common)} 张 GT 没有对应预测，已跳过")
+    if missing and not args.allow_missing:
+        raise SystemExit(
+            f"{len(missing)} 张 GT 没有对应预测，评测会不完整。\n"
+            f"  缺失示例: {', '.join(missing[:10])}\n"
+            "请补齐预测。若只是排查，可显式加 --allow-missing 跳过；"
+            "跳过后的指标会偏高，不能作为正式结果。"
+        )
+    if missing:
+        print(
+            f"警告: 已跳过 {len(missing)} 张缺少预测的 GT；"
+            "该指标只用于排查，不能写入正式对比表。"
+        )
 
     per_image = {}
     for name in common:
@@ -57,7 +73,13 @@ def main() -> None:
     if common:
         keys = ["mIoU", "meanDice", "meanBoundaryF1"]
         agg = {k: float(np.mean([per_image[n][k] for n in common])) for k in keys}
-    payload = {"n": len(common), "summary": agg, "per_image": per_image}
+    payload = {
+        "n": len(common),
+        "summary": agg,
+        "skipped_missing": len(missing),
+        "allow_missing": bool(args.allow_missing),
+        "per_image": per_image,
+    }
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps(payload, ensure_ascii=False, indent=2))

@@ -32,7 +32,7 @@
 | `scripts/validate_dataset.py` | 校验图片与 mask 配套、尺寸一致、类别合法、重复图片 |
 | `scripts/split_dataset.py` | 将 `data/exports` 划分为 `data/splits/{train,val,test}` |
 | `scripts/convert_masks.py` | 将其他工具导出的 PNG mask 规整为 0..5 类别（Label Studio 流程不需要） |
-| `model/zero_shot_inference.py` | 加载 SAM 按 GT 单点提示推理；`--lora-dir` / `--decoder-ckpt` 可评测两条微调分支 |
+| `model/zero_shot_inference.py` | 加载 SAM 按 GT 单点提示推理（oracle-point，不是自动实例分割）；`--lora-dir` / `--decoder-ckpt` 可评测两条微调分支 |
 | `evaluation/evaluate.py` | 对齐 GT 与预测 mask，输出 mIoU / Dice / 边界 F1 |
 | `scripts/run_ablation.py` | 汇总多份评测结果，生成 Markdown 对比表 |
 | `model/quick_demo.py` | 不依赖标注，单图验证权重与显卡（点提示或自动模式） |

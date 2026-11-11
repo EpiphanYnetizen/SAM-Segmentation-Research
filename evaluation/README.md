@@ -19,6 +19,9 @@ python evaluation/evaluate.py --gt data/splits/val --pred outputs/zero_shot --ou
 
 预测 mask 与 GT mask 同名；`--gt` / `--pred` 支持 `masks/` 目录树或纯 PNG 目录。
 
+默认要求 GT 与预测一一对应；有 GT 缺少预测会直接报错。只有排查时才能显式加
+`--allow-missing` 跳过，跳过后的指标会偏高，不能写进正式对比表。
+
 微调后评测复用同一脚本，仅替换 `--pred` 为 `outputs/finetuned` 或 `outputs/mask_decoder_v1`。
 
 ## 输出格式
