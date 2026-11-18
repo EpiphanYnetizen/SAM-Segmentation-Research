@@ -79,13 +79,27 @@ python model/quick_demo.py --image data/raw/xxx.jpg --point 800 600
 ## 组长任务
 
 ```bash
-python model/train_mask_decoder.py --check          # 先确认冻结策略
+python model/train_mask_decoder.py --check
 python model/train_mask_decoder.py --config model/config/mask_decoder.yaml
 ```
 
-需要补的部分：数据加载与提示构造同上一节第 4 步；encoder 前向放进 `torch.no_grad()`，
-只保留 `mask_decoder` 参数的梯度；保存 `{"model": state_dict}` 到
-`checkpoints/lora/mask_decoder/<run_id>/mask_decoder.pth`，推理时用 `--decoder-ckpt` 加载。
+训练循环已实现：冻结 `image_encoder` 与 `prompt_encoder`，只更新 `mask_decoder`；
+loss 为 focal + dice；checkpoint 保存为 `{"model": state_dict}`。
+
+合成数据 smoke test（不依赖组员 A）：
+
+```bash
+python model/train_mask_decoder.py --data-dir outputs/smoke_train \
+  --val-dir outputs/smoke_train --epochs 2 --limit 2 \
+  --out outputs/smoke_train_run
+```
+
+实测：4 个合成实例，2 epoch，loss `0.0067 -> 0.0000`，val Dice `1.0000`；
+`outputs/smoke_train_run/mask_decoder.pth` 可被
+`zero_shot_inference.py --decoder-ckpt` 加载，评测 mIoU≈1.0。
+
+正式训练把 `--data-dir` / `--val-dir` 换成 `data/splits/train` / `data/splits/val`，
+输出目录换成 `checkpoints/lora/mask_decoder/<run_id>/`。
 
 分工与时间安排见 [`../team-plan.md`](../team-plan.md)。
 
@@ -97,7 +111,7 @@ python model/train_mask_decoder.py --config model/config/mask_decoder.yaml
 ## 当前状态
 
 - `zero_shot_inference.py`、`quick_demo.py`、`sam_runtime.py`：已实现，尚未在真实数据上批量跑过。
-- `train_lora.py`、`train_mask_decoder.py`：只有配置加载、LoRA 注入/冻结策略和 `--check` 自检，
-  训练循环未实现，直接运行会报错退出。
+- `train_mask_decoder.py`：训练循环已实现，合成数据已跑通；尚未在真实 `data/splits` 上训练。
+- `train_lora.py`：只有配置加载、LoRA 注入和 `--check` 自检，训练循环待组员 B 补。
 
-补完训练循环后，请在本文件登记实测命令与耗时。
+真实数据训练完成后，请在本文件登记命令、耗时和指标。

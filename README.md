@@ -36,15 +36,14 @@
 | `evaluation/evaluate.py` | 对齐 GT 与预测 mask，输出 mIoU / Dice / 边界 F1 |
 | `scripts/run_ablation.py` | 汇总多份评测结果，生成 Markdown 对比表 |
 | `model/quick_demo.py` | 不依赖标注，单图验证权重与显卡（点提示或自动模式） |
+| `app/main.py` | Gradio 点提示演示：点图或输入坐标，返回叠加 mask 与 score |
+| `model/train_mask_decoder.py` | mask decoder 训练循环：冻结 encoder/prompt，focal+dice，保存 checkpoint |
 
-### 待实现（脚手架已就位，训练循环和 UI 推理未接）
+### 待实现（LoRA 训练循环未接）
 
 | 模块 | 已有 | 待办 | 负责人 |
 |---|---|---|---|
 | `model/train_lora.py` | 配置加载、LoRA 注入、`--check` 自检 | 训练循环、checkpoint 保存 | 组员 B |
-| `model/train_mask_decoder.py` | 配置加载、冻结策略、`--check` 自检 | 训练循环、checkpoint 保存 | 组长 |
-| `app/main.py` | Gradio 界面与启动参数 | 把点击坐标接到 `sam_runtime.predict_with_prompt` | 组长 |
-
 未实现的部分会明确报错退出，不会静默输出全零结果。训练前先跑自检：
 
 ```powershell
@@ -58,8 +57,8 @@ python model\train_mask_decoder.py --check
 2. 组员 B：安装 `model/requirements.txt`，下载权重，在 `val` 上运行 `model/zero_shot_inference.py`。
 3. 组员 A：运行 `evaluation/evaluate.py`，产出第一份 `outputs/zero_shot_metrics.json` 基线。
 4. 组员 B：`python model\train_lora.py --check` 通过后，补训练循环，产出 `checkpoints/lora/encoder/<run_id>/`。
-5. 组长：`python model\train_mask_decoder.py --check` 通过后，补训练循环，产出 `checkpoints/lora/mask_decoder/<run_id>/mask_decoder.pth`。
-6. 组长：把 `app/main.py` 接到 `model/sam_runtime.py`，完成点提示演示。
+5. 组长：`train_mask_decoder.py` 已实现训练循环；A 的数据到位后直接训练，产出 `outputs/mask_decoder_v1/mask_decoder.pth`。
+6. 组长：`app/main.py` 已接点提示演示；微调后加 `--lora-dir` / `--decoder-ckpt` 即可加载新权重。
 
 > `data/exports/images`、`data/exports/masks`、`data/annotations`、`data/splits` 已建好；空目录用 `.gitkeep` 占位，真实数据不会进 Git。
 
@@ -105,7 +104,8 @@ python scripts\run_ablation.py --metrics outputs\zero_shot_metrics.json outputs\
 - [x] zero-shot 推理脚本与评测指标
 - [ ] 组员 A：自采 80-120 张并标注（目标 400-600 个实例）
 - [ ] 组员 B：补 `train_lora.py` 训练循环，产出 encoder LoRA
-- [ ] 组长：补 `train_mask_decoder.py` 训练循环并接入 UI
+- [x] 组长：接入 Gradio 点提示演示
+- [x] 组长：`train_mask_decoder.py` 训练循环（合成数据已跑通）
 - [ ] 三人：`zero-shot vs fine-tuned` 对比表
 - [ ] 最终报告 + 答辩演示
 

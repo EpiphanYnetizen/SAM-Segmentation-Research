@@ -3,11 +3,13 @@ checkpoint: checkpoints/sam_vit_b_01ec64.pth
 device: cuda
 
 data_dir: data/splits/train
+val_dir: data/splits/val
 out_dir: outputs/mask_decoder_v1
+seed: 42
 
 training:
   epochs: 5
-  batch_size: 2
+  batch_size: 1
   learning_rate: 1.0e-4
   freeze: [image_encoder, prompt_encoder]
   loss: focal_dice
